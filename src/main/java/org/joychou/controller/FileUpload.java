@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,13 +19,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
-import static org.joychou.utils.Security.isImage;
-
 
 /**
- * @author: JoyChou (joychou@joychou.org)
- * @date:   2018.08.15
- * @desc:   Java file upload
+ * @author  JoyChou (joychou@joychou.org)
+ * @date    2018.08.15
+ * @desc    Java file upload
  */
 
 @Controller
@@ -136,11 +136,11 @@ public class FileUpload {
     }
 
     /**
-     * @desc 不建议使用transferTo，因为原始的MultipartFile会被覆盖
-     * @url https://stackoverflow.com/questions/24339990/how-to-convert-a-multipart-file-to-file
+     * 不建议使用transferTo，因为原始的MultipartFile会被覆盖
+     * https://stackoverflow.com/questions/24339990/how-to-convert-a-multipart-file-to-file
+     *
      * @param multiFile
      * @return
-     * @throws Exception
      */
     private File convert(MultipartFile multiFile) throws Exception {
         String fileName = multiFile.getOriginalFilename();
@@ -153,5 +153,19 @@ public class FileUpload {
         fos.write(multiFile.getBytes());
         fos.close();
         return convFile;
+    }
+
+    /**
+     * Check if the file is a picture.
+     *
+     * @param file
+     * @return
+     */
+    public static boolean isImage(File file) throws IOException {
+        BufferedImage bi = ImageIO.read(file);
+        if (bi == null) {
+            return false;
+        }
+        return true;
     }
 }

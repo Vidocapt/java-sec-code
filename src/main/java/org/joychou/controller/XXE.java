@@ -1,10 +1,9 @@
 package org.joychou.controller;
 
-
 import org.dom4j.io.SAXReader;
-import org.springframework.stereotype.*;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -12,6 +11,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import org.xml.sax.XMLReader;
 import java.io.*;
 import org.xml.sax.InputSource;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.SAXParserFactory;
@@ -19,26 +19,25 @@ import javax.xml.parsers.SAXParser;
 import org.xml.sax.helpers.DefaultHandler;
 import org.apache.commons.digester3.Digester;
 import org.jdom2.input.SAXBuilder;
-
+import org.joychou.util.WebUtils;
 
 /**
- * @author: JoyChou (joychou@joychou.org)
- * @date:   2017.12.22
- * @desc:   Java XXE 漏洞代码，修复代码在注释里
+ * Java xxe vul and safe code.
+ *
+ * @author JoyChou @2017-12-22
  */
 
-@Controller
+@RestController
 @RequestMapping("/xxe")
 public class XXE {
 
     @RequestMapping(value = "/xmlReader", method = RequestMethod.POST)
-    @ResponseBody
-    public  String xxe_xmlReader(HttpServletRequest request) {
+    public String xxe_xmlReader(HttpServletRequest request) {
         try {
-            String xml_con = getBody(request);
+            String xml_con = WebUtils.getRequestBody(request);
             System.out.println(xml_con);
             XMLReader xmlReader = XMLReaderFactory.createXMLReader();
-            xmlReader.parse( new InputSource(new StringReader(xml_con)) );  // parse xml
+            xmlReader.parse(new InputSource(new StringReader(xml_con)));  // parse xml
             return "ok";
         } catch (Exception e) {
             System.out.println(e);
@@ -48,10 +47,9 @@ public class XXE {
 
 
     @RequestMapping(value = "/xmlReader_fix", method = RequestMethod.POST)
-    @ResponseBody
-    public  String xxe_xmlReader_fix(HttpServletRequest request) {
+    public String xxe_xmlReader_fix(HttpServletRequest request) {
         try {
-            String xml_con = getBody(request);
+            String xml_con = WebUtils.getRequestBody(request);
             System.out.println(xml_con);
 
             XMLReader xmlReader = XMLReaderFactory.createXMLReader();
@@ -60,7 +58,7 @@ public class XXE {
             xmlReader.setFeature("http://xml.org/sax/features/external-general-entities", false);
             xmlReader.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
             //fix code end
-            xmlReader.parse( new InputSource(new StringReader(xml_con)) );  // parse xml
+            xmlReader.parse(new InputSource(new StringReader(xml_con)));  // parse xml
 
             return "ok";
         } catch (Exception e) {
@@ -71,14 +69,13 @@ public class XXE {
 
 
     @RequestMapping(value = "/SAXBuilder", method = RequestMethod.POST)
-    @ResponseBody
-    public  String xxe_SAXBuilder(HttpServletRequest request) {
+    public String xxe_SAXBuilder(HttpServletRequest request) {
         try {
-            String xml_con = getBody(request);
+            String xml_con = WebUtils.getRequestBody(request);
             System.out.println(xml_con);
 
             SAXBuilder builder = new SAXBuilder();
-            org.jdom2.Document document = builder.build( new InputSource(new StringReader(xml_con)) );  // cause xxe
+            org.jdom2.Document document = builder.build(new InputSource(new StringReader(xml_con)));  // cause xxe
             return "ok";
         } catch (Exception e) {
             System.out.println(e);
@@ -87,34 +84,31 @@ public class XXE {
     }
 
     @RequestMapping(value = "/SAXBuilder_fix", method = RequestMethod.POST)
-    @ResponseBody
-    public  String xxe_SAXBuilder_fix(HttpServletRequest request) {
+    public String xxe_SAXBuilder_fix(HttpServletRequest request) {
         try {
-            String xml_con = getBody(request);
+            String xml_con = WebUtils.getRequestBody(request);
             System.out.println(xml_con);
 
             SAXBuilder builder = new SAXBuilder();
             builder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
             builder.setFeature("http://xml.org/sax/features/external-general-entities", false);
             builder.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            org.jdom2.Document document = builder.build( new InputSource(new StringReader(xml_con)) );
+            org.jdom2.Document document = builder.build(new InputSource(new StringReader(xml_con)));
 
             return "ok";
         } catch (Exception e) {
-            System.out.println(e);
             return "except";
         }
     }
 
     @RequestMapping(value = "/SAXReader", method = RequestMethod.POST)
-    @ResponseBody
-    public  String xxe_SAXReader(HttpServletRequest request) {
+    public String xxe_SAXReader(HttpServletRequest request) {
         try {
-            String xml_con = getBody(request);
+            String xml_con = WebUtils.getRequestBody(request);
             System.out.println(xml_con);
 
             SAXReader reader = new SAXReader();
-            org.dom4j.Document document = reader.read(  new InputSource(new StringReader(xml_con)) ); // cause xxe
+            org.dom4j.Document document = reader.read(new InputSource(new StringReader(xml_con))); // cause xxe
 
             return "ok";
         } catch (Exception e) {
@@ -124,17 +118,16 @@ public class XXE {
     }
 
     @RequestMapping(value = "/SAXReader_fix", method = RequestMethod.POST)
-    @ResponseBody
-    public  String xxe_SAXReader_fix(HttpServletRequest request) {
+    public String xxe_SAXReader_fix(HttpServletRequest request) {
         try {
-            String xml_con = getBody(request);
+            String xml_con = WebUtils.getRequestBody(request);
             System.out.println(xml_con);
 
             SAXReader reader = new SAXReader();
             reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
             reader.setFeature("http://xml.org/sax/features/external-general-entities", false);
             reader.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            org.dom4j.Document document = reader.read(  new InputSource(new StringReader(xml_con)) );
+            org.dom4j.Document document = reader.read(new InputSource(new StringReader(xml_con)));
 
             return "ok";
         } catch (Exception e) {
@@ -144,10 +137,9 @@ public class XXE {
     }
 
     @RequestMapping(value = "/SAXParser", method = RequestMethod.POST)
-    @ResponseBody
     public String xxe_SAXParser(HttpServletRequest request) {
         try {
-            String xml_con = getBody(request);
+            String xml_con = WebUtils.getRequestBody(request);
             System.out.println(xml_con);
 
             SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -163,10 +155,9 @@ public class XXE {
 
 
     @RequestMapping(value = "/SAXParser_fix", method = RequestMethod.POST)
-    @ResponseBody
     public String xxe_SAXParser_fix(HttpServletRequest request) {
         try {
-            String xml_con = getBody(request);
+            String xml_con = WebUtils.getRequestBody(request);
             System.out.println(xml_con);
 
             SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -184,10 +175,9 @@ public class XXE {
 
 
     @RequestMapping(value = "/Digester", method = RequestMethod.POST)
-    @ResponseBody
     public String xxe_Digester(HttpServletRequest request) {
         try {
-            String xml_con = getBody(request);
+            String xml_con = WebUtils.getRequestBody(request);
             System.out.println(xml_con);
 
             Digester digester = new Digester();
@@ -201,10 +191,9 @@ public class XXE {
     }
 
     @RequestMapping(value = "/Digester_fix", method = RequestMethod.POST)
-    @ResponseBody
     public String xxe_Digester_fix(HttpServletRequest request) {
         try {
-            String xml_con = getBody(request);
+            String xml_con = WebUtils.getRequestBody(request);
             System.out.println(xml_con);
 
             Digester digester = new Digester();
@@ -223,10 +212,9 @@ public class XXE {
 
     // 有回显的XXE
     @RequestMapping(value = "/DocumentBuilder_return", method = RequestMethod.POST)
-    @ResponseBody
     public String xxeDocumentBuilderReturn(HttpServletRequest request) {
         try {
-            String xml_con = getBody(request);
+            String xml_con = WebUtils.getRequestBody(request);
             System.out.println(xml_con);
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -243,7 +231,7 @@ public class XXE {
                 NodeList child = rootNode.getChildNodes();
                 for (int j = 0; j < child.getLength(); j++) {
                     Node node = child.item(j);
-                    buf.append( node.getNodeName() + ": " + node.getTextContent() + "\n" );
+                    buf.append(node.getNodeName() + ": " + node.getTextContent() + "\n");
                 }
             }
             sr.close();
@@ -257,10 +245,9 @@ public class XXE {
 
 
     @RequestMapping(value = "/DocumentBuilder", method = RequestMethod.POST)
-    @ResponseBody
     public String DocumentBuilder(HttpServletRequest request) {
         try {
-            String xml_con = getBody(request);
+            String xml_con = WebUtils.getRequestBody(request);
             System.out.println(xml_con);
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -278,8 +265,8 @@ public class XXE {
                 for (int j = 0; j < child.getLength(); j++) {
                     Node node = child.item(j);
                     // 正常解析XML，需要判断是否是ELEMENT_NODE类型。否则会出现多余的的节点。
-                    if(child.item(j).getNodeType() == Node.ELEMENT_NODE) {
-                        result.append( node.getNodeName() + ": " + node.getFirstChild().getNodeValue() + "\n" );
+                    if (child.item(j).getNodeType() == Node.ELEMENT_NODE) {
+                        result.append(node.getNodeName() + ": " + node.getFirstChild().getNodeValue() + "\n");
                     }
                 }
             }
@@ -294,10 +281,9 @@ public class XXE {
 
 
     @RequestMapping(value = "/DocumentBuilder_fix", method = RequestMethod.POST)
-    @ResponseBody
     public String xxe_DocumentBuilder_fix(HttpServletRequest request) {
         try {
-            String xml_con = getBody(request);
+            String xml_con = WebUtils.getRequestBody(request);
             System.out.println(xml_con);
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -319,10 +305,9 @@ public class XXE {
 
 
     @RequestMapping(value = "/DocumentBuilder_xinclude", method = RequestMethod.POST)
-    @ResponseBody
     public String xxe_xinclude_DocumentBuilder(HttpServletRequest request) {
         try {
-            String xml_con = getBody(request);
+            String xml_con = WebUtils.getRequestBody(request);
             System.out.println(xml_con);
 
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -356,10 +341,9 @@ public class XXE {
 
 
     @RequestMapping(value = "/DocumentBuilder_xinclude_fix", method = RequestMethod.POST)
-    @ResponseBody
     public String xxe_xinclude_DocumentBuilder_fix(HttpServletRequest request) {
         try {
-            String xml_con = getBody(request);
+            String xml_con = WebUtils.getRequestBody(request);
             System.out.println(xml_con);
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
@@ -394,22 +378,46 @@ public class XXE {
         }
     }
 
-    // 获取body数据
-    private String getBody(HttpServletRequest request) throws IOException {
-        InputStream in = request.getInputStream();
-        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        StringBuffer sb = new StringBuffer("");
-        String temp;
-        while ((temp = br.readLine()) != null) {
-            sb.append(temp);
+
+    @PostMapping("/XMLReader/vul")
+    public String XMLReaderVul(HttpServletRequest request) {
+        try {
+            String xml_con = WebUtils.getRequestBody(request);
+            System.out.println(xml_con);
+            SAXParserFactory spf = SAXParserFactory.newInstance();
+            SAXParser saxParser = spf.newSAXParser();
+            XMLReader xmlReader = saxParser.getXMLReader();
+            xmlReader.parse(new InputSource(new StringReader(xml_con)));
+            return "test";
+        } catch (Exception e) {
+            System.out.println(e.toString());
+            return "except";
         }
-        if (in != null) {
-            in.close();
+    }
+
+
+    @PostMapping("/XMLReader/fixed")
+    public String XMLReaderSec(HttpServletRequest request) {
+        try {
+            String xml_con = WebUtils.getRequestBody(request);
+            System.out.println(xml_con);
+            SAXParserFactory spf = SAXParserFactory.newInstance();
+            SAXParser saxParser = spf.newSAXParser();
+            XMLReader xmlReader = saxParser.getXMLReader();
+            xmlReader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            xmlReader.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            xmlReader.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            xmlReader.parse(new InputSource(new StringReader(xml_con)));
+            return "test";
+        } catch (Exception e) {
+            System.out.println(e.toString());
+            return "except";
         }
-        if (br != null) {
-            br.close();
-        }
-        return sb.toString();
+    }
+
+
+    public static void main(String[] args) throws Exception {
+
     }
 
 }
